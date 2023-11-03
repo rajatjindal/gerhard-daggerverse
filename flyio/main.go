@@ -16,7 +16,8 @@ type Flyio struct{}
 func (m *Flyio) Deploy(ctx context.Context, dir *Directory, token *Secret) (string, error) {
 	return dag.Container().
 		From(fmt.Sprintf("flyio/flyctl:v%s", version)).
-		WithMountedFile("fly.toml", dir.File("fly.toml")).
+		WithMountedDirectory("/app", dir).
+		WithWorkdir("/app").
 		WithSecretVariable("FLY_API_TOKEN", token).
 		WithExec([]string{"deploy"}).
 		Stdout(ctx)
