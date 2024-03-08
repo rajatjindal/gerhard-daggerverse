@@ -1,3 +1,6 @@
+// Send notifications
+//
+// Currently supports Discord only. Coming up: Slack.
 package main
 
 import (
