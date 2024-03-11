@@ -1,2 +1,3 @@
 dagger.gen.go
-querybuilder/**
+internal/**
+vendor/
