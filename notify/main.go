@@ -37,3 +37,8 @@ func (n *Notify) Discord(ctx context.Context, webhookURL *Secret, message string
 
 	return fmt.Sprintf("MESSAGE SENT AT: %s\n%s\n", m.CreatedAt, m.Content), err
 }
+
+// Allow to send message on slack
+func (n *Notify) Slack() Slack {
+	return Slack{}
+}
