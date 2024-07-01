@@ -22,11 +22,6 @@ func (m *Sysi) Fastfetch(ctx context.Context) (string, error) {
 	return m.apk("fastfetch").WithExec([]string{"fastfetch", "--pipe", "false"}).Stdout(ctx)
 }
 
-// Interactively
-func (m *Sysi) I(pkg string) *Terminal {
-	return m.apk(pkg).Terminal()
-}
-
 func (m *Sysi) apk(pkg string) *Container {
 	return dag.Container().
 		From("alpine:20240606@sha256:166710df254975d4a6c4c407c315951c22753dcaa829e020a3fd5d18fff70dd2").
