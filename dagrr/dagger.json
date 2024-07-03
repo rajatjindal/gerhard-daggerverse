@@ -1,0 +1,12 @@
+{
+  "name": "dagrr",
+  "sdk": "go",
+  "dependencies": [
+    {
+      "name": "flyio",
+      "source": "../flyio"
+    }
+  ],
+  "source": ".",
+  "engineVersion": "v0.11.9"
+}
