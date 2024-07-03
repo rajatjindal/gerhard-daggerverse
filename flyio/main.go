@@ -28,7 +28,10 @@ func New(
 	// fly auth token: `--token=env:FLY_API_TOKEN`
 	token *Secret,
 
-	// Fly.io org where all operations will run in: `--org=personal`
+	// Fly.io org where all operations will run in, defaults to: `--org=personal`
+	//
+	// +optional
+	// +default="personal"
 	org string,
 
 	// flyctl version to use: `--version=0.2.79`
