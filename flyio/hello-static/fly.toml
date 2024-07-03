@@ -1,4 +1,4 @@
-app = "gostatic-example-2024-03-08"
+app = "gostatic-example-2024-07-03"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
