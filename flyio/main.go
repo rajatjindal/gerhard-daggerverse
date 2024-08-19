@@ -7,17 +7,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"main/internal/dagger"
 	"time"
 )
 
 const (
 	// https://hub.docker.com/r/flyio/flyctl/tags
-	latestVersion = "0.2.79"
+	latestVersion = "0.2.93"
 )
 
 type Flyio struct {
 	// +private
-	Container *Container
+	Container *dagger.Container
 	// +private
 	Version string
 	// +private
@@ -26,7 +27,7 @@ type Flyio struct {
 
 func New(
 	// fly auth token: `--token=env:FLY_API_TOKEN`
-	token *Secret,
+	token *dagger.Secret,
 
 	// Fly.io org where all operations will run in, defaults to: `--org=personal`
 	//
@@ -42,7 +43,7 @@ func New(
 	// Custom container to use as the base container
 	//
 	// +optional
-	container *Container,
+	container *dagger.Container,
 ) *Flyio {
 	if container == nil {
 		if version == "" {
@@ -66,7 +67,7 @@ func New(
 func (m *Flyio) Deploy(
 	ctx context.Context,
 	// App directory - must contain `fly.toml`
-	dir *Directory,
+	dir *dagger.Directory,
 ) (string, error) {
 	return m.Container.
 		WithMountedDirectory("/app", dir).
@@ -85,4 +86,16 @@ func (m *Flyio) Create(
 	return m.Container.
 		WithExec([]string{"apps", "create", app, "--org", m.Org}).
 		Stdout(ctx)
+}
+
+// Opens terminal in this app: `dagger call ... terminal --app=gostatic-example-2024-07-03` --interactive
+func (m *Flyio) Terminal(
+	ctx context.Context,
+	// App name: `--app=myapp-2024-07-03`
+	app string,
+
+) *dagger.Container {
+	return m.Container.
+		WithExec([]string{"ssh", "console", "--app", app, "--org", m.Org}).
+		Terminal()
 }
