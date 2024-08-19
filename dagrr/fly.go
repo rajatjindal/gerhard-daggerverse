@@ -4,7 +4,6 @@ import (
 	"context"
 	"dagger/dagrr/internal/dagger"
 	"fmt"
-	"strings"
 )
 
 type DagrrFly struct {
@@ -28,7 +27,6 @@ func (m *DagrrFly) Manifest(
 	// +default="performance-2x"
 	size string,
 ) *dagger.Directory {
-	mount := strings.ReplaceAll(m.Dagrr.App, "-", "_")
 	toml := fmt.Sprintf(`# https://fly.io/docs/reference/configuration/
 
 app = "%s"
@@ -40,7 +38,7 @@ kill_timeout = 30
   image = "registry.dagger.io/engine:v%s"
 
 [mounts]
-  source = "%s"
+  source = "dagger"
   destination = "/var/lib/dagger"
   initial_size = "%s"
 
@@ -58,7 +56,7 @@ kill_timeout = 30
 [[services]]
   internal_port = 2345
   protocol = "tcp"
-  auto_stop_machines = 'off'
+  auto_stop_machines = false
   auto_start_machines = true
   min_machines_running = 1
   processes = ["dagger"]
@@ -69,7 +67,7 @@ kill_timeout = 30
 
 [[vm]]
   size = "%s"
-	`, m.Dagrr.App, m.Dagrr.Version, mount, disk, size)
+	`, m.Dagrr.App, m.Dagrr.Version, disk, size)
 
 	return dag.Directory().WithNewFile("fly.toml", toml)
 }

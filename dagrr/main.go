@@ -6,6 +6,8 @@ import (
 	"dagger/dagrr/internal/dagger"
 	"strings"
 	"time"
+
+	"github.com/0x6flab/namegenerator"
 )
 
 type Dagrr struct {
@@ -23,7 +25,7 @@ func New(
 	// +default="0.12.5"
 	version string,
 
-	// App name, defaults to version & date: `--app=dagger-v0119-2024-07-03`
+	// App name, defaults to version & unique name & date: `--app=dagger-v0-11-9-<GENERATED_NAME>-2024-07-03`
 	//
 	// +optional
 	app string,
@@ -37,6 +39,7 @@ func New(
 		app = strings.Join([]string{
 			"dagger",
 			m.versionUrlized(),
+			strings.ToLower(namegenerator.NewGenerator().Generate()),
 			time.Now().Format("2006-01-02"),
 		}, "-")
 	}
@@ -65,5 +68,5 @@ func (m *Dagrr) OnFlyio(
 }
 
 func (m *Dagrr) versionUrlized() string {
-	return "v" + strings.ReplaceAll(m.Version, ".", "")
+	return "v" + strings.ReplaceAll(m.Version, ".", "-")
 }
