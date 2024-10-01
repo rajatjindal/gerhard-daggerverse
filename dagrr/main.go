@@ -18,11 +18,11 @@ type Dagrr struct {
 }
 
 func New(
-	// Dagger version to use: `--version=0.11.9`
+	// Dagger version to use: `--version=0.12.0`
 	//
 	// +optional
 	// https://github.com/dagger/dagger/blob/main/CHANGELOG.md
-	// +default="0.12.5"
+	// +default="0.13.3"
 	version string,
 
 	// App name, defaults to version & unique name & date: `--app=dagger-v0-11-9-<GENERATED_NAME>-2024-07-03`

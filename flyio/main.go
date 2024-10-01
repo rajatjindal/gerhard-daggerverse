@@ -72,7 +72,7 @@ func (m *Flyio) Deploy(
 	return m.Container.
 		WithMountedDirectory("/app", dir).
 		WithWorkdir("/app").
-		WithExec([]string{"deploy"}).
+		WithExec([]string{"/flyctl", "deploy"}).
 		Stdout(ctx)
 }
 
@@ -84,7 +84,7 @@ func (m *Flyio) Create(
 
 ) (string, error) {
 	return m.Container.
-		WithExec([]string{"apps", "create", app, "--org", m.Org}).
+		WithExec([]string{"/flyctl", "apps", "create", app, "--org", m.Org}).
 		Stdout(ctx)
 }
 
@@ -96,6 +96,6 @@ func (m *Flyio) Terminal(
 
 ) *dagger.Container {
 	return m.Container.
-		WithExec([]string{"ssh", "console", "--app", app, "--org", m.Org}).
+		WithExec([]string{"/flyctl", "ssh", "console", "--app", app, "--org", m.Org}).
 		Terminal()
 }
