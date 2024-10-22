@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+
+	"main/internal/dagger"
 	"github.com/slack-go/slack"
 )
 
@@ -12,7 +14,7 @@ type Slack struct {
 func (s *Slack) SendMessage(
 	ctx context.Context,
 	// The slack token to authenticate with the slack organization
-	token *Secret,
+	token *dagger.Secret,
 	// The sidebar color of the message
 	color string,
 	// The content of the notification to send
