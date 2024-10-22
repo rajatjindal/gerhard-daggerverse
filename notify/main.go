@@ -8,13 +8,14 @@ import (
 	"errors"
 	"fmt"
 
+	"main/internal/dagger"
 	"github.com/disgoorg/disgo/webhook"
 )
 
 type Notify struct{}
 
 // EXAMPLE: dagger call discord --webhook-url env:DISCORD_WEBHOOK --message "Hi from Dagger Notify Module 👋 Learn more at https://github.com/gerhard/daggerverse"
-func (n *Notify) Discord(ctx context.Context, webhookURL *Secret, message string) (string, error) {
+func (n *Notify) Discord(ctx context.Context, webhookURL *dagger.Secret, message string) (string, error) {
 	if message == "" {
 		return "", errors.New("--message cannot be an empty string")
 	}
