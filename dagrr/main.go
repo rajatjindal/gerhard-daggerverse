@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"dagger/dagrr/internal/dagger"
 	"strings"
 	"time"
@@ -18,18 +19,26 @@ type Dagrr struct {
 }
 
 func New(
-	// Dagger version to use: `--version=0.12.0`
+	ctx context.Context,
+
+	// Dagger version to use: `--version=0.12.0` (omit for latest)
 	//
 	// +optional
-	// https://github.com/dagger/dagger/blob/main/CHANGELOG.md
-	// +default="0.13.3"
 	version string,
 
 	// App name, defaults to version & unique name & date: `--app=dagger-v0-11-9-<GENERATED_NAME>-2024-07-03`
 	//
 	// +optional
 	app string,
-) *Dagrr {
+) (*Dagrr, error) {
+	if version == "" {
+		// If version isn't set, assume latest
+		v, err := dag.Version(ctx)
+		if err != nil {
+			return nil, err
+		}
+		version = v[1:]
+	}
 
 	m := &Dagrr{
 		Version: version,
@@ -45,7 +54,7 @@ func New(
 	}
 	m.App = app
 
-	return m
+	return m, nil
 }
 
 // Manages Dagger on Fly.io
