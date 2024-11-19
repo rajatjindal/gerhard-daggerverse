@@ -1,8 +1,9 @@
-// Manages Dagger on a bunch of platforms
+// Manages Dagger Engines on a bunch of platforms
 
 package main
 
 import (
+	"context"
 	"dagger/dagrr/internal/dagger"
 	"strings"
 	"time"
@@ -18,18 +19,26 @@ type Dagrr struct {
 }
 
 func New(
-	// Dagger version to use: `--version=0.12.0`
+	ctx context.Context,
+
+	// Dagger version to use (omit for latest): `--version=0.14.0`
 	//
 	// +optional
-	// https://github.com/dagger/dagger/blob/main/CHANGELOG.md
-	// +default="0.13.3"
 	version string,
 
-	// App name, defaults to version & unique name & date: `--app=dagger-v0-11-9-<GENERATED_NAME>-2024-07-03`
+	// App name, defaults to version & unique name & date: `--app=dagger-v0-14-0-<GENERATED_NAME>-2024-11-19`
 	//
 	// +optional
 	app string,
-) *Dagrr {
+) (*Dagrr, error) {
+	if version == "" {
+		// If version isn't set, assume latest
+		v, err := dag.Version(ctx)
+		if err != nil {
+			return nil, err
+		}
+		version = v[1:]
+	}
 
 	m := &Dagrr{
 		Version: version,
@@ -45,12 +54,12 @@ func New(
 	}
 	m.App = app
 
-	return m
+	return m, nil
 }
 
-// Manages Dagger on Fly.io
+// Manages Dagger on Fly.io: `dager call on-flyio --token=env:FLY_API_TOKEN deploy`
 func (m *Dagrr) OnFlyio(
-	// fly auth token: `--token=env:FLY_API_TOKEN`
+	// `flyctl tokens create deploy` then `--token=env:FLY_API_TOKEN`
 	token *dagger.Secret,
 
 	// Fly.io org name

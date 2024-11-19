@@ -88,7 +88,7 @@ func (m *Flyio) Create(
 		Stdout(ctx)
 }
 
-// Opens terminal in this app: `dagger call ... terminal --app=gostatic-example-2024-07-03` --interactive
+// Opens terminal in this app: `dagger call ... terminal --app=gostatic-example-2024-07-03 --interactive`
 func (m *Flyio) Terminal(
 	ctx context.Context,
 	// App name: `--app=myapp-2024-07-03`
