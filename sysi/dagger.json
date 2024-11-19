@@ -1,6 +1,6 @@
 {
   "name": "sysi",
+  "engineVersion": "v0.14.0",
   "sdk": "go",
-  "source": ".",
-  "engineVersion": "v0.11.9"
+  "source": "."
 }
