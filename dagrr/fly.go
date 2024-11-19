@@ -13,7 +13,7 @@ type DagrrFly struct {
 	Flyio *dagger.Flyio
 }
 
-// App manifest: dagger call on-flyio --token=env:FLY_API_TOKEN manifest file --path=fly.toml export --path=fly.toml
+// App manifest: `dagger call on-flyio --token=env:FLY_API_TOKEN manifest file --path=fly.toml export --path=fly.toml`
 func (m *DagrrFly) Manifest(
 	// Disk size in GB
 	//
@@ -72,7 +72,9 @@ kill_timeout = 30
 	return dag.Directory().WithNewFile("fly.toml", toml)
 }
 
-// Deploy with default manifest: dagger call on-flyio --token=env:FLY_API_TOKEN deploy
+// Deploy with default manifest: `dagger call on-flyio --token=env:FLY_API_TOKEN deploy`
+// Then: `export _EXPERIMENTAL_DAGGER_RUNNER_HOST=tcp://<APP_NAME>.internal:2345`
+// Assumes https://fly.io/docs/networking/private-networking (clashes with Tailscale MagicDNS)
 func (m *DagrrFly) Deploy(
 	// +optional
 	dir *dagger.Directory,
