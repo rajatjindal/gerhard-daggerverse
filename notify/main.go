@@ -1,6 +1,6 @@
 // Send notifications
 //
-// Currently supports Discord only. Coming up: Slack.
+// Supports Discord & Slack.
 package main
 
 import (
@@ -9,13 +9,19 @@ import (
 	"fmt"
 
 	"main/internal/dagger"
+
 	"github.com/disgoorg/disgo/webhook"
+	"github.com/slack-go/slack"
 )
 
 type Notify struct{}
 
-// EXAMPLE: dagger call discord --webhook-url env:DISCORD_WEBHOOK --message "Hi from Dagger Notify Module 👋 Learn more at https://github.com/gerhard/daggerverse"
-func (n *Notify) Discord(ctx context.Context, webhookURL *dagger.Secret, message string) (string, error) {
+// Message a Discord webhook: `dagger call discord --webhook-url=env:DISCORD_WEBHOOK --message="👋 from Dagger notify module"`
+func (n *Notify) Discord(
+	ctx context.Context,
+	webhookURL *dagger.Secret,
+	message string,
+) (string, error) {
 	if message == "" {
 		return "", errors.New("--message cannot be an empty string")
 	}
@@ -39,7 +45,63 @@ func (n *Notify) Discord(ctx context.Context, webhookURL *dagger.Secret, message
 	return fmt.Sprintf("MESSAGE SENT AT: %s\n%s\n", m.CreatedAt, m.Content), err
 }
 
-// Allow to send message on slack
-func (n *Notify) Slack() Slack {
-	return Slack{}
+// Message a specific Slack channel: `dagger call slack --token=env:SLACK_TOKEN --channel-id=C07PBDE3U57 --color="#FC0" --message="👋 from Dagger notify module"`
+func (n *Notify) Slack(
+	ctx context.Context,
+	// The slack token to authenticate with the slack organization
+	token *dagger.Secret,
+	// The sidebar color of the message
+	color string,
+	// The content of the notification to send
+	message string,
+	// The channel where to post the message
+	channelId string,
+	// Set a title to the message
+	// +optional
+	title string,
+	// Set a footer to the message
+	// +optional
+	footer string,
+	// Set an icon in the footer, the icon should be a link
+	// +optional
+	footerIcon string,
+	// Add an image in the message
+	// +optional
+	ImageUrl string,
+	// The thread id if we want to reply to a message or in a thread
+	// +optional
+	threadId string,
+) (string, error) {
+	clearToken, err := token.Plaintext(ctx)
+	api := slack.New(clearToken)
+	attachment := slack.Attachment{
+		Color:      color,
+		Text:       message,
+		MarkdownIn: []string{"text"},
+		Title:      title,
+		Footer:     footer,
+		FooterIcon: footerIcon,
+		ImageURL:   ImageUrl,
+	}
+
+	options := []slack.MsgOption{
+		slack.MsgOptionText("", false),
+		slack.MsgOptionAttachments(attachment),
+		slack.MsgOptionAsUser(true),
+	}
+
+	if threadId != "" {
+		options = append(options, slack.MsgOptionTS(threadId))
+	}
+
+	_, ts, err := api.PostMessage(
+		channelId,
+		options...,
+	)
+
+	if err != nil {
+		return "", err
+	}
+
+	return ts, nil
 }

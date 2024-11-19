@@ -18,11 +18,11 @@ dagger call -m github.com/gerhard/daggerverse/notify \
 ## Slack
 
 ```shell
-dagger call slack send-message --help
+dagger call slack --help
 Send a message to a specific slack channel or reply in a thread
 
 Usage:
-  dagger call slack send-message [flags]
+  dagger call slack [flags]
 
 Flags:
       --channel-id string    The channel where to post the message
@@ -46,7 +46,7 @@ Then the message in the thread looks like:
 ```shell
 export SLACK_TOKEN="xoxb-not-a-real-token-this-will-not-work"
 
-dagger call slack send-message \ 
+dagger call slack \ 
   --channel-id="<CHANNEL_ID>" \
   --token=env:SLACK_TOKEN \
   --color="#2596be" \
@@ -56,7 +56,7 @@ dagger call slack send-message \
   --footer-icon="https://avatars.githubusercontent.com/u/78824383?s=280&v=4" \
   --image-url="https://framerusercontent.com/images/bJT2c1WWr6bzO8aoEkh0Zz1Ra8.webp"
 
-dagger call slack send-message \
+dagger call slack \
   --channel-id="<CHANNEL_ID>" \
   --token=env:SLACK_TOKEN \
   --color="danger" \
@@ -78,8 +78,7 @@ type Demo struct{}
 func (m *Demo) SlackExample(ctx context.Context, token *Secret) error {
 	threadId, err := dag.
 		Notify().
-		Slack().
-		SendMessage(
+		Slack(
 			ctx,
 			token,
 			"#2596be",
@@ -99,8 +98,7 @@ func (m *Demo) SlackExample(ctx context.Context, token *Secret) error {
 	// Reply to the previous message
 	_, err = dag.
 		Notify().
-		Slack().
-		SendMessage(
+		Slack(
 			ctx,
 			token,
 			"danger",
