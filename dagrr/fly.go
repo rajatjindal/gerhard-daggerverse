@@ -26,6 +26,14 @@ func (m *DagrrFly) Manifest(
 	// +optional
 	// +default="performance-2x"
 	size string,
+
+	// Memory to request, see https://fly.io/docs/reference/configuration/#memory
+	// +optional
+	memory string,
+
+	// GPU kind to use, see https://fly.io/docs/reference/configuration/#gpu_kind
+	// +optional
+	gpuKind string,
 ) *dagger.Directory {
 	toml := fmt.Sprintf(`# https://fly.io/docs/reference/configuration/
 
@@ -67,7 +75,15 @@ kill_timeout = 30
 
 [[vm]]
   size = "%s"
-	`, m.Dagrr.App, m.Dagrr.Version, disk, size)
+`, m.Dagrr.App, m.Dagrr.Version, disk, size)
+
+	if memory != "" {
+		toml = fmt.Sprintf("%s  memory = %q\n", toml, memory)
+	}
+
+	if gpuKind != "" {
+		toml = fmt.Sprintf("%s  gpu_kind = %q\n", toml, gpuKind)
+	}
 
 	return dag.Directory().WithNewFile("fly.toml", toml)
 }
@@ -87,7 +103,7 @@ func (m *DagrrFly) Deploy(
 	}
 
 	if dir == nil {
-		dir = m.Manifest("100GB", "performance-2x")
+		dir = m.Manifest("100GB", "performance-2x", "", "")
 	}
 
 	return m.Flyio.Deploy(ctx, dir)
