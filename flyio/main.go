@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"main/internal/dagger"
+	"strings"
 	"time"
 )
 
@@ -68,11 +69,19 @@ func (m *Flyio) Deploy(
 	ctx context.Context,
 	// App directory - must contain `fly.toml`
 	dir *dagger.Directory,
+	// Regions - only deploy to the following regions
+	// +optional
+	regions []string,
 ) (string, error) {
+	args := []string{"/flyctl", "deploy"}
+	if len(regions) > 0 {
+		args = append(args, "--regions")
+		args = append(args, strings.Join(regions, ","))
+	}
 	return m.Container.
 		WithMountedDirectory("/app", dir).
 		WithWorkdir("/app").
-		WithExec([]string{"/flyctl", "deploy"}).
+		WithExec(args).
 		Stdout(ctx)
 }
 

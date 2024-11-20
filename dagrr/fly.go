@@ -27,6 +27,10 @@ func (m *DagrrFly) Manifest(
 	// +default="performance-2x"
 	size string,
 
+	// Primary region to use for deploying new machines, see https://fly.io/docs/reference/configuration/#primary-region
+	// +optional
+	primaryRegion string,
+
 	// Memory to request, see https://fly.io/docs/reference/configuration/#memory
 	// +optional
 	memory string,
@@ -35,9 +39,15 @@ func (m *DagrrFly) Manifest(
 	// +optional
 	gpuKind string,
 ) *dagger.Directory {
+	if primaryRegion != "" {
+		// workaround to leave the config untouched if the region isn't set
+		primaryRegion = fmt.Sprintf("primary_region = %q", primaryRegion)
+	}
+
 	toml := fmt.Sprintf(`# https://fly.io/docs/reference/configuration/
 
 app = "%s"
+%s
 
 kill_signal = "SIGINT"
 kill_timeout = 30
@@ -75,7 +85,7 @@ kill_timeout = 30
 
 [[vm]]
   size = "%s"
-`, m.Dagrr.App, m.Dagrr.Version, disk, size)
+`, m.Dagrr.App, primaryRegion, m.Dagrr.Version, disk, size)
 
 	if memory != "" {
 		toml = fmt.Sprintf("%s  memory = %q\n", toml, memory)
@@ -94,6 +104,8 @@ kill_timeout = 30
 func (m *DagrrFly) Deploy(
 	// +optional
 	dir *dagger.Directory,
+	// +optional
+	regions []string,
 ) (string, error) {
 	ctx := context.Background()
 
@@ -103,8 +115,10 @@ func (m *DagrrFly) Deploy(
 	}
 
 	if dir == nil {
-		dir = m.Manifest("100GB", "performance-2x", "", "")
+		dir = m.Manifest("100GB", "performance-2x", "", "", "")
 	}
 
-	return m.Flyio.Deploy(ctx, dir)
+	return m.Flyio.Deploy(ctx, dir, dagger.FlyioDeployOpts{
+		Regions: regions,
+	})
 }
