@@ -38,10 +38,24 @@ func (m *DagrrFly) Manifest(
 	// GPU kind to use, see https://fly.io/docs/reference/configuration/#gpu_kind
 	// +optional
 	gpuKind string,
+
+	// Environment variables to export on the machine, see https://fly.io/docs/reference/configuration/#the-env-variables-section
+	// Each env var needs to follow the TOML format (eg. MY_KEY = "value")
+	// FIXME(samalba): turn this into a map[string]string once supported by the Dagger Go SDK
+	// +optional
+	environment []string,
 ) *dagger.Directory {
 	if primaryRegion != "" {
 		// workaround to leave the config untouched if the region isn't set
 		primaryRegion = fmt.Sprintf("primary_region = %q", primaryRegion)
+	}
+
+	envVars := ""
+	for _, envVar := range environment {
+		if envVars == "" {
+			envVars = "[env]\n"
+		}
+		envVars = fmt.Sprintf("%s  %s\n", envVars, envVar)
 	}
 
 	toml := fmt.Sprintf(`# https://fly.io/docs/reference/configuration/
@@ -51,6 +65,8 @@ app = "%s"
 
 kill_signal = "SIGINT"
 kill_timeout = 30
+
+%s
 
 [build]
   image = "registry.dagger.io/engine:v%s"
@@ -85,7 +101,7 @@ kill_timeout = 30
 
 [[vm]]
   size = "%s"
-`, m.Dagrr.App, primaryRegion, m.Dagrr.Version, disk, size)
+`, m.Dagrr.App, primaryRegion, envVars, m.Dagrr.Version, disk, size)
 
 	if memory != "" {
 		toml = fmt.Sprintf("%s  memory = %q\n", toml, memory)
@@ -115,7 +131,7 @@ func (m *DagrrFly) Deploy(
 	}
 
 	if dir == nil {
-		dir = m.Manifest("100GB", "performance-2x", "", "", "")
+		dir = m.Manifest("100GB", "performance-2x", "", "", "", nil)
 	}
 
 	return m.Flyio.Deploy(ctx, dir, dagger.FlyioDeployOpts{
