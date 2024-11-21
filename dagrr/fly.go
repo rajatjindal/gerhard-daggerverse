@@ -58,6 +58,11 @@ func (m *DagrrFly) Manifest(
 		envVars = fmt.Sprintf("%s  %s\n", envVars, envVar)
 	}
 
+	engineImageFlavor := ""
+	if gpuKind != "" {
+		engineImageFlavor = "-gpu"
+	}
+
 	toml := fmt.Sprintf(`# https://fly.io/docs/reference/configuration/
 
 app = "%s"
@@ -69,7 +74,7 @@ kill_timeout = 30
 %s
 
 [build]
-  image = "registry.dagger.io/engine:v%s"
+  image = "registry.dagger.io/engine:v%s%s"
 
 [mounts]
   source = "dagger"
@@ -101,7 +106,7 @@ kill_timeout = 30
 
 [[vm]]
   size = "%s"
-`, m.Dagrr.App, primaryRegion, envVars, m.Dagrr.Version, disk, size)
+`, m.Dagrr.App, primaryRegion, envVars, m.Dagrr.Version, engineImageFlavor, disk, size)
 
 	if memory != "" {
 		toml = fmt.Sprintf("%s  memory = %q\n", toml, memory)
