@@ -4,6 +4,8 @@ import (
 	"context"
 	"dagger/dagrr/internal/dagger"
 	"fmt"
+
+	"github.com/dagger/dagger/sdk/go/dag"
 )
 
 type DagrrFly struct {
@@ -74,7 +76,7 @@ kill_timeout = 30
 %s
 
 [build]
-  image = "registry.dagger.io/engine:v%s%s"
+  image = "rajatjindal/nvidia-dagger-debug:1"
 
 [mounts]
   source = "dagger"
