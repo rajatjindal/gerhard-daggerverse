@@ -4,8 +4,6 @@ import (
 	"context"
 	"dagger/dagrr/internal/dagger"
 	"fmt"
-
-	"github.com/dagger/dagger/sdk/go/dag"
 )
 
 type DagrrFly struct {
