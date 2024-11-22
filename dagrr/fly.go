@@ -58,10 +58,10 @@ func (m *DagrrFly) Manifest(
 		envVars = fmt.Sprintf("%s  %s\n", envVars, envVar)
 	}
 
-	engineImageFlavor := ""
-	if gpuKind != "" {
-		engineImageFlavor = "-gpu"
-	}
+	// engineImageFlavor := ""
+	// if gpuKind != "" {
+	// 	engineImageFlavor = "-gpu"
+	// }
 
 	toml := fmt.Sprintf(`# https://fly.io/docs/reference/configuration/
 
@@ -106,7 +106,7 @@ kill_timeout = 30
 
 [[vm]]
   size = "%s"
-`, m.Dagrr.App, primaryRegion, envVars, m.Dagrr.Version, engineImageFlavor, disk, size)
+`, m.Dagrr.App, primaryRegion, envVars, disk, size)
 
 	if memory != "" {
 		toml = fmt.Sprintf("%s  memory = %q\n", toml, memory)
